@@ -4,10 +4,12 @@ import os
 import openai
 from openai import OpenAI
 import functions
+import time
 
 
 # 환경 변수에서 OpenAI API 키 로드
-OPENAI_API_KEY = os.getenv('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')
+OPENAI_API_KEY = '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'
+
 
 app = Flask(__name__)
 
@@ -66,17 +68,19 @@ def chat(): # 먼저 post에서 받아오는 데이터 정의
                     #PDF 서버에서 정보 찾기
                     arguments = json.loads(tool_call.function.arguments)
                     output = functions.information_from_pdf_server(arguments[announcment_id])
+                    client.beta.threads.runs.submit_tool_outputs(thread_id=thread_id,
+                                                                 run_id=run.id,
+                                                                 tool_outputs=[{
+                                                                     "tool_call_id": tool_call.id,
+                                                                     "output": json.dumps(output)
+                                                                 }])
+            time.sleep(1) #완료 후 1초간 대기
+    messages = client.beta.threads.messages.list(thread_id=thread_id)
+    response = messages.data[0].content[0].text.value
 
+    print(f"Assistant response: {response}")
+    return jsonify({"response": response})
     
-
-    
-
-    # functions.py에서 처리 로직 호출
-    response = functions.process_query(thread_id, announcment_id, message, assistant_id)
-    if response:
-        return jsonify({"response": response}), 200
-    else:
-        return jsonify({"error": "Unable to process the query."}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
