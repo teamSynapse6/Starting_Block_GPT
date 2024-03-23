@@ -14,25 +14,22 @@ OPENAI_API_KEY = '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'
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 
-#PDF서버로부터 id의 데이터를 호출하는 메소드
+# PDF서버로부터 id의 데이터를 호출하는 메소드
 def information_from_pdf_server(announcement_id):
-    # 공고의 txt 정보를 받아오는 엔드포인트 URL
+    print(f'서버 검색 요청, id:{announcement_id}')
     pdf_url = f"https://pdf.startingblock.co.kr/announcement?id={announcement_id}"
-    
-    # 서버로부터 정보를 GET 방식으로 요청
     response = requests.get(pdf_url)
     
-    # 응답 상태 코드가 200(성공)인 경우
     if response.status_code == 200:
-        # UTF-8로 인코딩된 텍스트 데이터를 처리
         text_data = response.content.decode('utf-8')
-        print(f"PDF 서버로부터 ID:{announcement_id}를 정상적으로 호출하였습니다")
+        print(f'호출된 데이터: {text_data}')
         return text_data
-    
-    # 응답 상태 코드가 200이 아닌 경우(실패)
+    elif response.status_code == 404:
+        print(f"ID: {announcement_id}에 해당하는 정보를 찾을 수 없습니다.")
+        return "요청하신 정보를 찾을 수 없습니다."
     else:
-        print(f"Error getting information: {response.text}")
-        return None
+        print(f"Error getting information: {response.status_code}")
+        return "서버에서 정보를 검색하는 동안 오류가 발생했습니다."
 
 def create_assistant(client):
     assistant_file_path = 'assistant.json'
@@ -46,8 +43,9 @@ def create_assistant(client):
     
     else:
         #만약 assistant.json이 없다면, 아래의 메소드를 사용하는 새 파일을 생성.
-        assistant = client.beta.assistant.create(
+        assistant = client.beta.assistants.create(
             instructions=assistant_instructions,
+            name = "Starting_Block_GPT_PDF_Assistant",
             model="gpt-3.5-turbo-1106",
              tools=[
                 {
