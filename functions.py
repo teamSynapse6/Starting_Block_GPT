@@ -16,19 +16,15 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 # PDF서버로부터 id의 데이터를 호출하는 메소드
 def information_from_pdf_server(announcement_id):
-    print(f'서버 검색 요청, id:{announcement_id}')
     pdf_url = f"https://pdf.startingblock.co.kr/announcement?id={announcement_id}"
     response = requests.get(pdf_url)
     
     if response.status_code == 200:
         text_data = response.content.decode('utf-8')
-        print(f'호출된 데이터: {text_data}')
         return text_data
     elif response.status_code == 404:
-        print(f"ID: {announcement_id}에 해당하는 정보를 찾을 수 없습니다.")
         return "요청하신 정보를 찾을 수 없습니다."
     else:
-        print(f"Error getting information: {response.status_code}")
         return "서버에서 정보를 검색하는 동안 오류가 발생했습니다."
 
 def create_assistant(client):
@@ -39,7 +35,6 @@ def create_assistant(client):
         with open(assistant_file_path, 'r') as file:
             assistant_data = json.load(file)
             assistant_id = assistant_data['assistant_id']
-            print("Loaded existing assistant ID.")
     
     else:
         #만약 assistant.json이 없다면, 아래의 메소드를 사용하는 새 파일을 생성.
@@ -71,7 +66,6 @@ def create_assistant(client):
         # 생성된 보조자 ID를 assistant.json 파일에 저장합니다.
         with open(assistant_file_path, 'w') as file:
             json.dump({'assistant_id': assistant.id}, file)
-            print("Created a new assistant and saved the ID.")
         assistant_id = assistant.id
 
     return assistant_id

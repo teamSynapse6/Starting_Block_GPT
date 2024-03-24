@@ -24,9 +24,7 @@ assistant_id = functions.create_assistant(client)  # 이 기능은 funcionts.py�
 # 대화 만들기
 @app.route('/start', methods=['GET'])
 def start_conversation():
-      print("새로운 대화 시작 중")
       thread = client.beta.threads.create()
-      print(f"새로운 대화가 쓰레드 {thread.id}에서 시작되었습니다")
       return jsonify({"thread_id": thread.id})
 
     
@@ -41,10 +39,8 @@ def chat(): # 먼저 post에서 받아오는 데이터 정의
 
     # 쓰레드 ID가 없을 경우
     if not thread_id:
-        print("Error: thread_id가 없습니다")
         return jsonify({"error": "thread_id가 없습니다"}), 400
 
-    print(f"Received message: {message} for thread ID: {thread_id}")
 
     #유저의 메시지를 쓰레드에 추가
     client.beta.threads.messages.create(thread_id=thread_id,
@@ -61,10 +57,8 @@ def chat(): # 먼저 post에서 받아오는 데이터 정의
                                                        run_id=run.id)
         #Run status의 출력에 따라 처리
         if run_status.status == "completed":
-            print('1차 프로세스가 완료')
             break
         elif run_status.status == "requires_action":
-            print('2차 프로세스 시작')
             for tool_call in run_status.required_action.submit_tool_outputs.tool_calls:
                 if tool_call.function.name == "information_from_pdf_server":
                     #PDF 서버에서 정보 찾기
@@ -80,7 +74,6 @@ def chat(): # 먼저 post에서 받아오는 데이터 정의
     messages = client.beta.threads.messages.list(thread_id=thread_id)
     response = messages.data[0].content[0].text.value
 
-    print(f"Assistant response: {response}")
     return jsonify({"response": response})
 
 # 대화 종료 후 쓰레드 삭제하기
@@ -91,16 +84,13 @@ def delete_thread():
     
     # thread_id의 유효성 검사
     if not thread_id:
-        print("Error: thread_id가 제공되지 않았습니다.")
         return jsonify({"error": "thread_id 파라미터가 필요합니다."}), 400
     
     # OpenAI API를 사용하여 스레드 삭제
     try:
         response = client.beta.threads.delete(thread_id)
-        print(f"스레드 {thread_id}가 삭제되었습니다.")
         return jsonify({"id": thread_id, "object": "thread.deleted", "deleted": True}), 200
     except Exception as e:
-        print(f"스레드 삭제 중 오류 발생: {e}")
         return jsonify({"error": "스레드를 삭제하는 동안 오류가 발생했습니다."}), 500
 
 
