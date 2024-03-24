@@ -8,7 +8,7 @@ import time
 
 
 # 환경 변수에서 OpenAI API 키 로드
-OPENAI_API_KEY = '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'
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 
 app = Flask(__name__)

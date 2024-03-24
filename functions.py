@@ -8,7 +8,7 @@ from prompts import instructions
 from prompts import instructions as assistant_instructions
 
 # 환경 변수에서 OpenAI API 키 로드
-OPENAI_API_KEY = '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'
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 #assistant 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
