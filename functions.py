@@ -22,7 +22,7 @@ def information_from_pdf_server(announcement_id):
     
     if response.status_code == 200:
         text_data = response.content.decode('utf-8')
-        print(f'호출된 데이터: {text_data}')
+        print('서버 데이터 호출을 완료했습니다')
         return text_data
     elif response.status_code == 404:
         print(f"ID: {announcement_id}에 해당하는 정보를 찾을 수 없습니다.")
