@@ -13,6 +13,11 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 #assistant 초기화
 client = OpenAI(api_key=OPENAI_API_KEY)
 
+#루트 설정
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+#어시스턴트_파일_패스
+assistant_file_path = os.path.join(BASE_DIR, 'assistant.json')
 
 # PDF서버로부터 id의 데이터를 호출하는 메소드
 def information_from_pdf_server(announcement_id):
@@ -27,9 +32,9 @@ def information_from_pdf_server(announcement_id):
     else:
         return "서버에서 정보를 검색하는 동안 오류가 발생했습니다."
 
-def create_assistant(client):
-    assistant_file_path = 'assistant.json'
 
+#어시스턴트 API 생성
+def create_assistant(client):
     #만약 assistant.json이 이미 있다면 로드.
     if os.path.exists(assistant_file_path):
         with open(assistant_file_path, 'r') as file:
